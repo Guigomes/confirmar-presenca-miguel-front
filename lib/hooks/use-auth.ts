@@ -2,8 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { onAuthStateChanged, signInWithRedirect, signOut as firebaseSignOut, type User } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  signInWithRedirect,
+  signOut as firebaseSignOut,
+  type User,
+} from 'firebase/auth';
 import { auth, googleProvider, consumeGoogleRedirectResult } from '@/lib/firebase/client';
+
+const POPUP_FALLBACK_CODES = new Set([
+  'auth/popup-blocked',
+  'auth/popup-closed-by-user',
+  'auth/cancelled-popup-request',
+  'auth/operation-not-supported-in-this-environment',
+]);
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -25,10 +38,23 @@ export function useUser() {
 
 export function useSignInWithGoogle() {
   return useMutation({
-    // Redirects the whole page to Google and back — more reliable than a
-    // popup on mobile browsers, which often block or silently drop popups.
+    // Popup is more reliable than a full-page redirect when the auth
+    // domain (firebaseapp.com) differs from the app's own domain, since
+    // some mobile browsers drop the pending-redirect state across that
+    // cross-domain hop. Falls back to redirect only if the popup itself
+    // can't open (blocked / unsupported webview).
     mutationFn: async () => {
-      await signInWithRedirect(auth, googleProvider);
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        return result.user;
+      } catch (err) {
+        const code = (err as { code?: string } | null)?.code;
+        if (code && POPUP_FALLBACK_CODES.has(code)) {
+          await signInWithRedirect(auth, googleProvider);
+          return null;
+        }
+        throw err;
+      }
     },
   });
 }
