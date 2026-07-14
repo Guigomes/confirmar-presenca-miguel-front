@@ -111,10 +111,30 @@ export default function HomePage() {
             Entra pro time! ⚽
           </h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Confirme sua presença e garanta seu lugar na escalação da festa.
+            O craque já tá escalado — agora só falta você!
           </p>
         </div>
-        <RsvpForm />
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr] lg:items-start">
+          {/* Figurinha do craque */}
+          <div className="mx-auto w-full max-w-[280px] lg:max-w-none">
+            <div className="-rotate-2 rounded-xl overflow-hidden shadow-xl ring-1 ring-black/10 transition-transform hover:rotate-0 duration-300">
+              <Image
+                src="/miguel-figurinha.jpg"
+                alt={`Figurinha do ${party.childName}, craque da festa`}
+                width={800}
+                height={800}
+                sizes="(min-width: 1024px) 340px, 280px"
+                className="w-full h-auto"
+              />
+            </div>
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
+              Figurinha oficial do craque da festa ⭐
+            </p>
+          </div>
+
+          <RsvpForm />
+        </div>
       </div>
     </div>
   );
