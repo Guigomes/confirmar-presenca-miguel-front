@@ -28,7 +28,7 @@ export default function HomePage() {
           </div>
 
           <p className="font-semibold text-brand-100 uppercase tracking-[0.3em] text-xs sm:text-sm mb-2">
-            A festa de futebol
+            A festa de
           </p>
           <h1 className="font-display leading-none mb-1">
             <span className="block text-6xl sm:text-8xl drop-shadow-[0_4px_0_rgba(0,0,0,0.25)]">
