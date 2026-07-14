@@ -3,16 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-  }
-
   * {
     @apply border-gray-200 dark:border-gray-800;
   }
@@ -39,9 +29,25 @@
     @apply rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900;
   }
 
-  /* Confetti dot pattern overlay */
-  .confetti-pattern {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.18) 2px, transparent 2px);
-    background-size: 24px 24px;
+  /* Gramado: faixas verticais de "corte de grama" sobre o degradê verde */
+  .grass-stripes {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 0px,
+      rgba(255, 255, 255, 0.06) 44px,
+      transparent 44px,
+      transparent 88px
+    );
+  }
+
+  /* Pontilhado sutil por cima do gramado (textura) */
+  .grass-texture {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+  }
+
+  /* Números do placar sempre alinhados */
+  .scoreboard-digits {
+    font-variant-numeric: tabular-nums;
   }
 }

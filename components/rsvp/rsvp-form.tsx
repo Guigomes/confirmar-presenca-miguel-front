@@ -58,14 +58,14 @@ export function RsvpForm() {
 
   if (submitted) {
     return (
-      <div className="card p-8 text-center">
-        <p className="text-5xl mb-4">{attended ? '🎉' : '😢'}</p>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          {attended ? 'Presença confirmada!' : 'Que pena!'}
+      <div className="card p-8 text-center border-t-4 border-t-brand-500">
+        <p className="text-5xl mb-4">{attended ? '⚽' : '😢'}</p>
+        <h3 className={cn('mb-2', attended ? 'font-display text-3xl text-brand-600 dark:text-brand-400' : 'text-xl font-bold text-gray-900 dark:text-gray-100')}>
+          {attended ? 'GOOOOL! Presença confirmada!' : 'Que pena!'}
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           {attended
-            ? `Nos vemos no aniversário do ${party.childName}. Obrigado por confirmar!`
+            ? `Você está escalado pra festa do ${party.childName}. Nos vemos em campo!`
             : `Obrigado por avisar — vamos sentir sua falta no aniversário do ${party.childName}.`}
         </p>
         <Button variant="secondary" onClick={() => setSubmitted(false)}>
@@ -92,7 +92,7 @@ export function RsvpForm() {
                 : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
             )}
           >
-            🎉 Vou!
+            ⚽ Tô dentro!
           </button>
           <button
             type="button"

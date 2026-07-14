@@ -11,11 +11,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/90">
       <div className="container-app flex h-14 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 font-bold text-brand-700 dark:text-brand-300">
-          <span className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-brand-600 text-white shadow-sm text-lg">
-            🎉
+        <Link href="/" className="flex items-center gap-2 font-display text-brand-700 dark:text-brand-400">
+          <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-brand-600 text-white shadow-sm text-lg">
+            ⚽
           </span>
-          <span className="hidden sm:inline tracking-tight">{party.title}</span>
+          <span className="hidden sm:inline tracking-wide">{party.title}</span>
         </Link>
 
         <div className="flex items-center gap-2">

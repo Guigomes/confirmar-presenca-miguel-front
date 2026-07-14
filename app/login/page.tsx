@@ -33,9 +33,9 @@ export default function LoginPage() {
     <div className="container-app py-16 flex justify-center">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-4xl">🎉</span>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{party.title}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Acesso para organizadores</p>
+          <span className="text-4xl">⚽</span>
+          <h1 className="font-display text-2xl text-brand-700 dark:text-brand-400 mt-2">{party.title}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Vestiário — acesso para organizadores</p>
         </div>
 
         <div className="card p-6">

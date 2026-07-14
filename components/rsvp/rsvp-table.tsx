@@ -52,7 +52,7 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   if (!rsvps.length) {
     return (
       <EmptyState
-        icon="🎈"
+        icon="⚽"
         title="Nenhuma confirmação ainda"
         description="Assim que os convidados confirmarem presença, eles aparecerão aqui."
       />
