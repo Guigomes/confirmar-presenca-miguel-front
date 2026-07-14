@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDeleteRsvp } from '@/lib/hooks/use-rsvp';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils/cn';
 import { timeAgo } from '@/lib/utils/date';
@@ -17,10 +18,73 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'companions_count', label: 'Convidados' },
 ];
 
+function DeleteConfirmModal({
+  rsvp,
+  pending,
+  onCancel,
+  onConfirm,
+}: {
+  rsvp: Rsvp;
+  pending: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onCancel();
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onCancel]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={() => !pending && onCancel()}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Remover resposta de ${rsvp.guest_name}`}
+    >
+      <div
+        className="card w-full max-w-sm p-6 text-center border-t-4 border-t-red-500 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-4xl mb-3">🟥</p>
+        <h3 className="font-display text-xl text-gray-900 dark:text-gray-100 mb-1">
+          Cartão vermelho?
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          A resposta de <span className="font-semibold text-gray-900 dark:text-gray-100">{rsvp.guest_name}</span>
+          {' '}vai ser removida da lista.
+        </p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 mb-5">
+          Essa ação não pode ser desfeita.
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="secondary" onClick={onCancel} disabled={pending}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={onConfirm} loading={pending}>
+            Remover
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   const deleteRsvp = useDeleteRsvp();
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [toDelete, setToDelete] = useState<Rsvp | null>(null);
+
+  function confirmDelete() {
+    if (!toDelete) return;
+    deleteRsvp.mutate(toDelete.id, {
+      onSuccess: () => setToDelete(null),
+    });
+  }
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
@@ -90,11 +154,7 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{timeAgo(r.created_at)}</p>
               </div>
               <button
-                onClick={() => {
-                  if (confirm(`Remover a confirmação de ${r.guest_name}?`)) {
-                    deleteRsvp.mutate(r.id);
-                  }
-                }}
+                onClick={() => setToDelete(r)}
                 className="shrink-0 text-xs text-red-600 dark:text-red-400 hover:underline"
               >
                 Remover
@@ -126,6 +186,15 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
           </div>
         ))}
       </div>
+
+      {toDelete && (
+        <DeleteConfirmModal
+          rsvp={toDelete}
+          pending={deleteRsvp.isPending}
+          onCancel={() => !deleteRsvp.isPending && setToDelete(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 }

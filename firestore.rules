@@ -20,7 +20,8 @@ service cloud.firestore {
       // Só os organizadores podem ver, editar ou remover confirmações.
       allow read, update, delete: if request.auth != null
                     && request.auth.token.email in [
-                      'guigomes.ti@gmail.com'
+                      'guigomes.ti@gmail.com',
+                      'jas.oliveira02@gmail.com'
                     ];
     }
   }
