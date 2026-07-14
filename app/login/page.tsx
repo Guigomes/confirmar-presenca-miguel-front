@@ -7,14 +7,27 @@ import { useSignInWithGoogle, useUser } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { party } from '@/lib/config/party';
 
+function authErrorMessage(error: unknown): string {
+  const code = (error as { code?: string } | null)?.code;
+  if (code === 'auth/unauthorized-domain') {
+    return 'Este domínio não está autorizado no Firebase. Peça para o organizador adicionar este endereço em Authentication → Settings → Authorized domains.';
+  }
+  if (code) {
+    return `Não foi possível entrar (${code}). Tente novamente.`;
+  }
+  return 'Não foi possível entrar. Tente novamente.';
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, redirectError } = useUser();
   const signIn = useSignInWithGoogle();
 
   useEffect(() => {
     if (user) router.replace('/admin');
   }, [user, router]);
+
+  const error = redirectError ?? (signIn.isError ? signIn.error : null);
 
   return (
     <div className="container-app py-16 flex justify-center">
@@ -43,9 +56,9 @@ export default function LoginPage() {
             Entrar com Google
           </Button>
 
-          {signIn.isError && (
+          {error != null && (
             <p className="mt-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg px-3 py-2">
-              Não foi possível entrar. Tente novamente.
+              {authErrorMessage(error)}
             </p>
           )}
         </div>

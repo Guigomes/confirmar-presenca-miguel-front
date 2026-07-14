@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
 import { initializeFirestore, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -20,3 +20,14 @@ export const db = isNewApp
   ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true })
   : getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// signInWithRedirect completes on the next page load — every useUser()
+// instance would otherwise race to consume the one-time result, so it's
+// cached here and shared across all callers.
+let redirectResultPromise: ReturnType<typeof getRedirectResult> | null = null;
+export function consumeGoogleRedirectResult() {
+  if (!redirectResultPromise) {
+    redirectResultPromise = getRedirectResult(auth);
+  }
+  return redirectResultPromise;
+}
