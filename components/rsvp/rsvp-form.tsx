@@ -80,7 +80,7 @@ export function RsvpForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="card p-6 sm:p-8 space-y-4">
       <div>
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-          Você vai poder vir?
+          Você vai participar?
         </label>
         <div className="grid grid-cols-2 gap-3">
           <button
