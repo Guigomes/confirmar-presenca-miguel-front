@@ -8,21 +8,19 @@ import { cn } from '@/lib/utils/cn';
 import { timeAgo } from '@/lib/utils/date';
 import type { Rsvp } from '@/types/rsvp';
 
-type SortKey = 'guest_name' | 'attending' | 'companions_count' | 'message' | 'created_at';
+type SortKey = 'guest_name' | 'attending' | 'companions_count';
 type SortDirection = 'asc' | 'desc';
 
-const COLUMNS: { key: SortKey; label: string }[] = [
-  { key: 'guest_name', label: 'Convidado' },
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: 'guest_name', label: 'Nome' },
   { key: 'attending', label: 'Status' },
-  { key: 'companions_count', label: 'Acompanhantes' },
-  { key: 'message', label: 'Mensagem' },
-  { key: 'created_at', label: 'Respondido' },
+  { key: 'companions_count', label: 'Convidados' },
 ];
 
 export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   const deleteRsvp = useDeleteRsvp();
-  const [sortKey, setSortKey] = useState<SortKey>('created_at');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
@@ -34,6 +32,8 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   }
 
   const sorted = useMemo(() => {
+    if (!sortKey) return [...rsvps].sort((a, b) => b.created_at.localeCompare(a.created_at));
+
     const dir = sortDirection === 'asc' ? 1 : -1;
     return [...rsvps].sort((a, b) => {
       switch (sortKey) {
@@ -43,10 +43,6 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
           return dir * (Number(a.attending) - Number(b.attending));
         case 'companions_count':
           return dir * (a.companions_count - b.companions_count);
-        case 'message':
-          return dir * (a.message ?? '').localeCompare(b.message ?? '', 'pt-BR');
-        case 'created_at':
-          return dir * a.created_at.localeCompare(b.created_at);
         default:
           return 0;
       }
@@ -64,76 +60,71 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   }
 
   return (
-    <div className="card overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-800 text-left text-xs text-gray-500 dark:text-gray-400">
-              {COLUMNS.map((col) => (
-                <th key={col.key} className="px-4 py-3 font-medium whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => toggleSort(col.key)}
-                    className="inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
-                  >
-                    {col.label}
-                    <span className={cn('text-[10px]', sortKey !== col.key && 'opacity-0')}>
-                      {sortDirection === 'asc' ? '▲' : '▼'}
-                    </span>
-                  </button>
-                </th>
-              ))}
-              <th className="px-4 py-3 font-medium" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {sorted.map((r) => (
-              <tr key={r.id}>
-                <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                  {r.guest_name}
-                </td>
-                <td className="px-4 py-3">
-                  {r.attending ? (
-                    <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                      Vai
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                      Não vai
-                    </Badge>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {r.attending ? (
-                    <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                      +{r.companions_count}
-                    </Badge>
-                  ) : (
-                    <span className="text-gray-400 dark:text-gray-600">—</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-400 min-w-[180px] max-w-xs whitespace-normal break-words">
-                  {r.message || '—'}
-                </td>
-                <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                  {timeAgo(r.created_at)}
-                </td>
-                <td className="px-4 py-3 text-right whitespace-nowrap">
-                  <button
-                    onClick={() => {
-                      if (confirm(`Remover a confirmação de ${r.guest_name}?`)) {
-                        deleteRsvp.mutate(r.id);
-                      }
-                    }}
-                    className="text-xs text-red-600 dark:text-red-400 hover:underline"
-                  >
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Ordenar por:</span>
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => toggleSort(opt.key)}
+            className={cn(
+              'inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+              sortKey === opt.key
+                ? 'border-brand-600 bg-brand-50 text-brand-700 dark:border-brand-500 dark:bg-brand-950 dark:text-brand-300'
+                : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
+            )}
+          >
+            {opt.label}
+            {sortKey === opt.key && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-3">
+        {sorted.map((r) => (
+          <div key={r.id} className="card p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 dark:text-gray-100">{r.guest_name}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{timeAgo(r.created_at)}</p>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm(`Remover a confirmação de ${r.guest_name}?`)) {
+                    deleteRsvp.mutate(r.id);
+                  }
+                }}
+                className="shrink-0 text-xs text-red-600 dark:text-red-400 hover:underline"
+              >
+                Remover
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 mt-2">
+              {r.attending ? (
+                <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                  Vai
+                </Badge>
+              ) : (
+                <Badge className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                  Não vai
+                </Badge>
+              )}
+              {r.attending && (
+                <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                  +{r.companions_count} acompanhante{r.companions_count === 1 ? '' : 's'}
+                </Badge>
+              )}
+            </div>
+
+            {r.message && (
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words">
+                {r.message}
+              </p>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
