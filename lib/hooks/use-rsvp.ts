@@ -1,29 +1,31 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
-import type { Rsvp, RsvpFormValues } from '@/types/database';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  Timestamp,
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import type { Rsvp, RsvpFormValues } from '@/types/rsvp';
 
-let _client: ReturnType<typeof createClient> | null = null;
-function getClient() {
-  if (!_client) _client = createClient();
-  return _client;
-}
+const RSVPS_COLLECTION = 'rsvps';
 
 export function useCreateRsvp() {
   return useMutation({
     mutationFn: async (values: RsvpFormValues) => {
-      const { data, error } = await getClient()
-        .from('rsvps')
-        .insert({
-          guest_name: values.guest_name,
-          companions_count: values.companions_count,
-          message: values.message || null,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
+      await addDoc(collection(db, RSVPS_COLLECTION), {
+        guest_name: values.guest_name,
+        companions_count: values.companions_count,
+        message: values.message || null,
+        created_at: serverTimestamp(),
+      });
     },
   });
 }
@@ -32,12 +34,20 @@ export function useRsvps() {
   return useQuery({
     queryKey: ['rsvps'],
     queryFn: async (): Promise<Rsvp[]> => {
-      const { data, error } = await getClient()
-        .from('rsvps')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data ?? [];
+      const snapshot = await getDocs(
+        query(collection(db, RSVPS_COLLECTION), orderBy('created_at', 'desc'))
+      );
+      return snapshot.docs.map((d) => {
+        const data = d.data();
+        const createdAt = data.created_at instanceof Timestamp ? data.created_at.toDate() : new Date();
+        return {
+          id: d.id,
+          guest_name: data.guest_name,
+          companions_count: data.companions_count,
+          message: data.message ?? null,
+          created_at: createdAt.toISOString(),
+        };
+      });
     },
   });
 }
@@ -46,8 +56,7 @@ export function useDeleteRsvp() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await getClient().from('rsvps').delete().eq('id', id);
-      if (error) throw error;
+      await deleteDoc(doc(db, RSVPS_COLLECTION, id));
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['rsvps'] });

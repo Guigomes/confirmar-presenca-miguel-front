@@ -4,7 +4,7 @@ import { useDeleteRsvp } from '@/lib/hooks/use-rsvp';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { timeAgo } from '@/lib/utils/date';
-import type { Rsvp } from '@/types/database';
+import type { Rsvp } from '@/types/rsvp';
 
 export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   const deleteRsvp = useDeleteRsvp();

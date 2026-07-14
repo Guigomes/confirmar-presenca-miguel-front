@@ -1,21 +1,24 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/lib/hooks/use-auth';
+import { isAdminEmail } from '@/lib/config/admins';
 import { AdminSignOut } from '@/components/layout/admin-sign-out';
-import type { UserRole } from '@/types/database';
+import { PageSpinner } from '@/components/ui/spinner';
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useUser();
+  const router = useRouter();
 
-  if (!user) redirect('/login');
+  useEffect(() => {
+    if (!loading && !user) router.replace('/login');
+  }, [loading, user, router]);
 
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .single();
-  const typedProfile = profile as { role: UserRole; full_name: string | null } | null;
+  if (loading || !user) return <PageSpinner />;
+
+  const isAdmin = isAdminEmail(user.email);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -27,7 +30,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
             <span className="text-gray-300 dark:text-gray-700">/</span>
             <span className="text-gray-700 dark:text-gray-300">
-              {typedProfile?.role === 'admin' ? 'Organizador' : 'Convidado'}
+              {isAdmin ? 'Organizador' : 'Convidado'}
             </span>
           </div>
           <AdminSignOut />
@@ -35,12 +38,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </div>
 
       <div className="container-app py-8">
-        {typedProfile?.role !== 'admin' ? (
+        {!isAdmin ? (
           <div className="card p-8 text-center">
             <p className="text-4xl mb-3">🔒</p>
             <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">Acesso restrito</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Sua conta ainda não tem permissão de organizador. Peça para um administrador liberar seu acesso.
+              Sua conta ({user.email}) ainda não tem permissão de organizador. Peça para um administrador liberar seu acesso.
             </p>
           </div>
         ) : (

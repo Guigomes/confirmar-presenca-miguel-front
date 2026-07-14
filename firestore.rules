@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Regras do Firestore para o app "Confirmar Presença - Miguel".
+// Cole este conteúdo em: Firebase Console > Firestore Database > Regras.
+//
+// Lista de e-mails com acesso de organizador — precisa ser IDÊNTICA à
+// lista em lib/config/admins.ts.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rsvps/{rsvpId} {
+      // Qualquer visitante pode confirmar presença.
+      allow create: if request.resource.data.guest_name is string
+                    && request.resource.data.guest_name.size() > 0
+                    && request.resource.data.guest_name.size() < 200
+                    && request.resource.data.companions_count is number
+                    && request.resource.data.companions_count >= 0
+                    && request.resource.data.companions_count <= 20;
+
+      // Só os organizadores podem ver, editar ou remover confirmações.
+      allow read, update, delete: if request.auth != null
+                    && request.auth.token.email in [
+                      'guigomes.ti@gmail.com'
+                    ];
+    }
+  }
+}

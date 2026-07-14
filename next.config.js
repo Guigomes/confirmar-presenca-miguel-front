@@ -4,15 +4,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-      },
-    ],
-  },
-
   webpack(config) {
     config.resolve.symlinks = false;
     return config;

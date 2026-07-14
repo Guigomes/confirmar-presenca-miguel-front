@@ -1,4 +1,4 @@
-import type { Rsvp } from '@/types/database';
+import type { Rsvp } from '@/types/rsvp';
 
 export function RsvpSummary({ rsvps }: { rsvps: Rsvp[] }) {
   const totalConfirmations = rsvps.length;
