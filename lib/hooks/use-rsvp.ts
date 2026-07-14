@@ -22,7 +22,8 @@ export function useCreateRsvp() {
     mutationFn: async (values: RsvpFormValues) => {
       await addDoc(collection(db, RSVPS_COLLECTION), {
         guest_name: values.guest_name,
-        companions_count: values.companions_count,
+        attending: values.attending,
+        companions_count: values.attending ? values.companions_count : 0,
         message: values.message || null,
         created_at: serverTimestamp(),
       });
@@ -43,6 +44,7 @@ export function useRsvps() {
         return {
           id: d.id,
           guest_name: data.guest_name,
+          attending: data.attending ?? true,
           companions_count: data.companions_count,
           message: data.message ?? null,
           created_at: createdAt.toISOString(),

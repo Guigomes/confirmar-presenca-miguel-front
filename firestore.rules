@@ -8,10 +8,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rsvps/{rsvpId} {
-      // Qualquer visitante pode confirmar presença.
+      // Qualquer visitante pode confirmar presença ou avisar que não vai.
       allow create: if request.resource.data.guest_name is string
                     && request.resource.data.guest_name.size() > 0
                     && request.resource.data.guest_name.size() < 200
+                    && request.resource.data.attending is bool
                     && request.resource.data.companions_count is number
                     && request.resource.data.companions_count >= 0
                     && request.resource.data.companions_count <= 20;

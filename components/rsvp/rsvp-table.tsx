@@ -25,9 +25,10 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
         <thead>
           <tr className="border-b border-gray-200 dark:border-gray-800 text-left text-xs text-gray-500 dark:text-gray-400">
             <th className="px-4 py-3 font-medium">Convidado</th>
+            <th className="px-4 py-3 font-medium">Status</th>
             <th className="px-4 py-3 font-medium">Acompanhantes</th>
             <th className="px-4 py-3 font-medium">Mensagem</th>
-            <th className="px-4 py-3 font-medium">Confirmado</th>
+            <th className="px-4 py-3 font-medium">Respondido</th>
             <th className="px-4 py-3 font-medium" />
           </tr>
         </thead>
@@ -36,9 +37,24 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
             <tr key={r.id}>
               <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{r.guest_name}</td>
               <td className="px-4 py-3">
-                <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                  +{r.companions_count}
-                </Badge>
+                {r.attending ? (
+                  <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    Vai
+                  </Badge>
+                ) : (
+                  <Badge className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                    Não vai
+                  </Badge>
+                )}
+              </td>
+              <td className="px-4 py-3">
+                {r.attending ? (
+                  <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    +{r.companions_count}
+                  </Badge>
+                ) : (
+                  <span className="text-gray-400 dark:text-gray-600">—</span>
+                )}
               </td>
               <td className="px-4 py-3 text-gray-600 dark:text-gray-400 max-w-xs truncate">
                 {r.message || '—'}
