@@ -23,7 +23,8 @@ export function useCreateRsvp() {
       await addDoc(collection(db, RSVPS_COLLECTION), {
         guest_name: values.guest_name,
         attending: values.attending,
-        companions_count: values.attending ? values.companions_count : 0,
+        companions_3plus: values.attending ? values.companions_3plus : 0,
+        companions_under3: values.attending ? values.companions_under3 : 0,
         message: values.message || null,
         created_at: serverTimestamp(),
       });
@@ -45,7 +46,10 @@ export function useRsvps() {
           id: d.id,
           guest_name: data.guest_name,
           attending: data.attending ?? true,
-          companions_count: data.companions_count,
+          // Respostas antigas só tinham "companions_count" (sem faixa etária);
+          // tratamos como 3+ anos, já que era a única categoria na época.
+          companions_3plus: data.companions_3plus ?? data.companions_count ?? 0,
+          companions_under3: data.companions_under3 ?? 0,
           message: data.message ?? null,
           created_at: createdAt.toISOString(),
         };

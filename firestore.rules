@@ -13,9 +13,12 @@ service cloud.firestore {
                     && request.resource.data.guest_name.size() > 0
                     && request.resource.data.guest_name.size() < 200
                     && request.resource.data.attending is bool
-                    && request.resource.data.companions_count is number
-                    && request.resource.data.companions_count >= 0
-                    && request.resource.data.companions_count <= 20;
+                    && request.resource.data.companions_3plus is number
+                    && request.resource.data.companions_3plus >= 0
+                    && request.resource.data.companions_3plus <= 20
+                    && request.resource.data.companions_under3 is number
+                    && request.resource.data.companions_under3 >= 0
+                    && request.resource.data.companions_under3 <= 20;
 
       // Só os organizadores podem ver, editar ou remover confirmações.
       allow read, update, delete: if request.auth != null

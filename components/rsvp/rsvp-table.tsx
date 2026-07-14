@@ -9,14 +9,18 @@ import { cn } from '@/lib/utils/cn';
 import { timeAgo } from '@/lib/utils/date';
 import type { Rsvp } from '@/types/rsvp';
 
-type SortKey = 'guest_name' | 'attending' | 'companions_count';
+type SortKey = 'guest_name' | 'attending' | 'companions_total';
 type SortDirection = 'asc' | 'desc';
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'guest_name', label: 'Nome' },
   { key: 'attending', label: 'Status' },
-  { key: 'companions_count', label: 'Convidados' },
+  { key: 'companions_total', label: 'Convidados' },
 ];
+
+function companionsTotal(r: Rsvp) {
+  return r.companions_3plus + r.companions_under3;
+}
 
 function DeleteConfirmModal({
   rsvp,
@@ -105,8 +109,8 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
           return dir * a.guest_name.localeCompare(b.guest_name, 'pt-BR');
         case 'attending':
           return dir * (Number(a.attending) - Number(b.attending));
-        case 'companions_count':
-          return dir * (a.companions_count - b.companions_count);
+        case 'companions_total':
+          return dir * (companionsTotal(a) - companionsTotal(b));
         default:
           return 0;
       }
@@ -171,10 +175,18 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
                   Não vai
                 </Badge>
               )}
-              {r.attending && (
+              {r.attending && r.companions_3plus > 0 && (
                 <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                  +{r.companions_count} acompanhante{r.companions_count === 1 ? '' : 's'}
+                  +{r.companions_3plus} (3+ anos)
                 </Badge>
+              )}
+              {r.attending && r.companions_under3 > 0 && (
+                <Badge className="bg-gold/20 text-yellow-700 dark:bg-gold/10 dark:text-gold">
+                  +{r.companions_under3} (-3 anos)
+                </Badge>
+              )}
+              {r.attending && r.companions_3plus === 0 && r.companions_under3 === 0 && (
+                <span className="text-xs text-gray-400 dark:text-gray-600">sozinho(a)</span>
               )}
             </div>
 

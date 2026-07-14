@@ -25,7 +25,8 @@ function rsvpErrorMessage(error: unknown): string {
 const rsvpSchema = z.object({
   attending: z.boolean(),
   guest_name: z.string().trim().min(2, 'Informe seu nome completo'),
-  companions_count: z.coerce.number().int().min(0).max(20),
+  companions_3plus: z.coerce.number().int().min(0).max(20),
+  companions_under3: z.coerce.number().int().min(0).max(20),
   message: z.string().trim().max(500).optional(),
 });
 
@@ -44,7 +45,7 @@ export function RsvpForm() {
     reset,
   } = useForm<RsvpValues>({
     resolver: zodResolver(rsvpSchema),
-    defaultValues: { attending: true, guest_name: '', companions_count: 0, message: '' },
+    defaultValues: { attending: true, guest_name: '', companions_3plus: 0, companions_under3: 0, message: '' },
   });
 
   const attending = watch('attending');
@@ -117,14 +118,32 @@ export function RsvpForm() {
       />
 
       {attending && (
-        <Input
-          label="Quantidade de acompanhantes"
-          type="number"
-          min={0}
-          max={20}
-          error={errors.companions_count?.message}
-          {...register('companions_count')}
-        />
+        <div>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Quem vem com você?
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Não conta você — só quem vai te acompanhar. Pedimos a idade separada pra organizar direitinho o buffet.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="3 anos ou mais"
+              type="number"
+              min={0}
+              max={20}
+              error={errors.companions_3plus?.message}
+              {...register('companions_3plus')}
+            />
+            <Input
+              label="Menos de 3 anos"
+              type="number"
+              min={0}
+              max={20}
+              error={errors.companions_under3?.message}
+              {...register('companions_under3')}
+            />
+          </div>
+        </div>
       )}
 
       <Textarea
