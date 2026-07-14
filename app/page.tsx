@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { RsvpForm } from '@/components/rsvp/rsvp-form';
 import { Countdown } from '@/components/countdown';
 import { party } from '@/lib/config/party';
@@ -23,6 +24,10 @@ export default function HomePage() {
         <span className="absolute right-16 bottom-16 text-7xl opacity-15 rotate-6 pointer-events-none select-none hidden sm:block" aria-hidden="true">🥅</span>
 
         <div className="container-app pt-12 pb-20 sm:pt-16 sm:pb-24 relative text-center">
+          <div className="mx-auto mb-5 h-28 w-28 sm:h-36 sm:w-36 rounded-full border-4 border-gold shadow-xl overflow-hidden relative ring-4 ring-brand-900/40">
+            <Image src="/miguel-hero.jpg" alt={party.childName} fill sizes="144px" className="object-cover" priority />
+          </div>
+
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-brand-50 mb-6">
             📣 Convocação especial
           </div>
