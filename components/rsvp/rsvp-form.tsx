@@ -11,6 +11,17 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 import { party } from '@/lib/config/party';
 
+function rsvpErrorMessage(error: unknown): string {
+  const code = (error as { code?: string } | null)?.code;
+  if (code === 'permission-denied') {
+    return 'O banco de dados ainda não está liberado para receber confirmações. Avise o organizador (regras do Firestore pendentes).';
+  }
+  if (code) {
+    return `Não foi possível enviar sua resposta (${code}). Tente novamente.`;
+  }
+  return 'Não foi possível enviar sua resposta. Tente novamente.';
+}
+
 const rsvpSchema = z.object({
   attending: z.boolean(),
   guest_name: z.string().trim().min(2, 'Informe seu nome completo'),
@@ -125,7 +136,7 @@ export function RsvpForm() {
 
       {createRsvp.isError && (
         <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 rounded-lg px-3 py-2">
-          Não foi possível enviar sua resposta. Tente novamente.
+          {rsvpErrorMessage(createRsvp.error)}
         </p>
       )}
 
