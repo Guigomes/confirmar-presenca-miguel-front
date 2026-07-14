@@ -10,5 +10,5 @@ export const party = {
   location: 'Buffet Jumboloo',
   address: 'R. Maracaju, 1420 - Centro',
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=R.+Maracaju%2C+1420+-+Centro',
-  rsvpDeadline: '2026-07-26', // AAAA-MM-DD
+  rsvpDeadline: '2026-07-29', // AAAA-MM-DD
 };

@@ -92,9 +92,9 @@ export default function HomePage() {
           </div>
           <div className="card p-5 text-center border-t-4 border-t-gold">
             <span className="text-3xl">🟨</span>
-            <p className="font-bold text-sm text-gray-900 dark:text-gray-100 mt-2">Confirme até</p>
+            <p className="font-bold text-sm text-gray-900 dark:text-gray-100 mt-2">Por favor, confirme até</p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 capitalize">{formatLongDate(party.rsvpDeadline)}</p>
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">senão é cartão amarelo!</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">senão é cartão amarelo! 😂</p>
           </div>
         </div>
       </section>
