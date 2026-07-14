@@ -76,7 +76,7 @@ export default function HomePage() {
       <section className="container-app py-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="card p-5 text-center border-t-4 border-t-brand-500">
-            <span className="text-3xl">📅</span>
+            <span className="text-3xl">⏰</span>
             <p className="font-bold text-sm text-gray-900 dark:text-gray-100 capitalize mt-2">
               {formatLongDate(party.date)}
             </p>
