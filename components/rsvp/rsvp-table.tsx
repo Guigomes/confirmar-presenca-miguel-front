@@ -23,6 +23,12 @@ function companionsTotal(r: Rsvp) {
   return r.companions_3plus + r.companions_under3;
 }
 
+function parseCompanions(value: string): number {
+  const n = Number(value);
+  if (value.trim() === '' || Number.isNaN(n)) return 0;
+  return Math.min(Math.max(Math.trunc(n), 0), 20);
+}
+
 function useEscapeKey(onEscape: () => void) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -94,8 +100,10 @@ function EditRsvpModal({
   onSave: (values: RsvpEditValues) => void;
 }) {
   const [attending, setAttending] = useState(rsvp.attending);
-  const [companions3plus, setCompanions3plus] = useState(rsvp.companions_3plus);
-  const [companionsUnder3, setCompanionsUnder3] = useState(rsvp.companions_under3);
+  // string em vez de number: permite apagar o campo (ficar vazio) enquanto
+  // digita, sem "grudar" em 0 a cada tecla apertada.
+  const [companions3plus, setCompanions3plus] = useState(String(rsvp.companions_3plus));
+  const [companionsUnder3, setCompanionsUnder3] = useState(String(rsvp.companions_under3));
 
   useEscapeKey(onCancel);
 
@@ -159,7 +167,7 @@ function EditRsvpModal({
                 min={0}
                 max={20}
                 value={companions3plus}
-                onChange={(e) => setCompanions3plus(Number(e.target.value))}
+                onChange={(e) => setCompanions3plus(e.target.value)}
               />
               <Input
                 label="Menos de 3 anos"
@@ -167,7 +175,7 @@ function EditRsvpModal({
                 min={0}
                 max={20}
                 value={companionsUnder3}
-                onChange={(e) => setCompanionsUnder3(Number(e.target.value))}
+                onChange={(e) => setCompanionsUnder3(e.target.value)}
               />
             </div>
           </div>
@@ -181,8 +189,8 @@ function EditRsvpModal({
             onClick={() =>
               onSave({
                 attending,
-                companions_3plus: companions3plus,
-                companions_under3: companionsUnder3,
+                companions_3plus: parseCompanions(companions3plus),
+                companions_under3: parseCompanions(companionsUnder3),
               })
             }
             loading={pending}
