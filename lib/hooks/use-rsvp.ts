@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   Timestamp,
+  updateDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Rsvp, RsvpFormValues } from '@/types/rsvp';
@@ -54,6 +55,28 @@ export function useRsvps() {
           created_at: createdAt.toISOString(),
         };
       });
+    },
+  });
+}
+
+export type RsvpEditValues = {
+  attending: boolean;
+  companions_3plus: number;
+  companions_under3: number;
+};
+
+export function useUpdateRsvp() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, values }: { id: string; values: RsvpEditValues }) => {
+      await updateDoc(doc(db, RSVPS_COLLECTION, id), {
+        attending: values.attending,
+        companions_3plus: values.attending ? values.companions_3plus : 0,
+        companions_under3: values.attending ? values.companions_under3 : 0,
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['rsvps'] });
     },
   });
 }

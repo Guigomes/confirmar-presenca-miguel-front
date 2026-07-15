@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useDeleteRsvp } from '@/lib/hooks/use-rsvp';
+import { useDeleteRsvp, useUpdateRsvp, type RsvpEditValues } from '@/lib/hooks/use-rsvp';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils/cn';
 import { timeAgo } from '@/lib/utils/date';
@@ -22,6 +23,16 @@ function companionsTotal(r: Rsvp) {
   return r.companions_3plus + r.companions_under3;
 }
 
+function useEscapeKey(onEscape: () => void) {
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onEscape();
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onEscape]);
+}
+
 function DeleteConfirmModal({
   rsvp,
   pending,
@@ -33,13 +44,7 @@ function DeleteConfirmModal({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onCancel();
-    }
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onCancel]);
+  useEscapeKey(onCancel);
 
   return (
     <div
@@ -77,17 +82,140 @@ function DeleteConfirmModal({
   );
 }
 
+function EditRsvpModal({
+  rsvp,
+  pending,
+  onCancel,
+  onSave,
+}: {
+  rsvp: Rsvp;
+  pending: boolean;
+  onCancel: () => void;
+  onSave: (values: RsvpEditValues) => void;
+}) {
+  const [attending, setAttending] = useState(rsvp.attending);
+  const [companions3plus, setCompanions3plus] = useState(rsvp.companions_3plus);
+  const [companionsUnder3, setCompanionsUnder3] = useState(rsvp.companions_under3);
+
+  useEscapeKey(onCancel);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={() => !pending && onCancel()}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Editar resposta de ${rsvp.guest_name}`}
+    >
+      <div
+        className="card w-full max-w-sm p-6 border-t-4 border-t-brand-500 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-4xl text-center mb-3">✏️</p>
+        <h3 className="font-display text-xl text-gray-900 dark:text-gray-100 mb-1 text-center">
+          Editar resposta
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 text-center">
+          {rsvp.guest_name}
+        </p>
+
+        <div className="mb-4">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vai participar?</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setAttending(true)}
+              className={cn(
+                'rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors',
+                attending
+                  ? 'border-brand-600 bg-brand-50 text-brand-700 dark:border-brand-500 dark:bg-brand-950 dark:text-brand-300'
+                  : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
+              )}
+            >
+              ⚽ Vai
+            </button>
+            <button
+              type="button"
+              onClick={() => setAttending(false)}
+              className={cn(
+                'rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors',
+                !attending
+                  ? 'border-red-500 bg-red-50 text-red-700 dark:border-red-500 dark:bg-red-950/40 dark:text-red-300'
+                  : 'border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
+              )}
+            >
+              😢 Não vai
+            </button>
+          </div>
+        </div>
+
+        {attending && (
+          <div className="mb-5">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Acompanhantes</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="3 anos ou mais"
+                type="number"
+                min={0}
+                max={20}
+                value={companions3plus}
+                onChange={(e) => setCompanions3plus(Number(e.target.value))}
+              />
+              <Input
+                label="Menos de 3 anos"
+                type="number"
+                min={0}
+                max={20}
+                value={companionsUnder3}
+                onChange={(e) => setCompanionsUnder3(Number(e.target.value))}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="secondary" onClick={onCancel} disabled={pending}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() =>
+              onSave({
+                attending,
+                companions_3plus: companions3plus,
+                companions_under3: companionsUnder3,
+              })
+            }
+            loading={pending}
+          >
+            Salvar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
   const deleteRsvp = useDeleteRsvp();
+  const updateRsvp = useUpdateRsvp();
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [toDelete, setToDelete] = useState<Rsvp | null>(null);
+  const [toEdit, setToEdit] = useState<Rsvp | null>(null);
 
   function confirmDelete() {
     if (!toDelete) return;
     deleteRsvp.mutate(toDelete.id, {
       onSuccess: () => setToDelete(null),
     });
+  }
+
+  function saveEdit(values: RsvpEditValues) {
+    if (!toEdit) return;
+    updateRsvp.mutate(
+      { id: toEdit.id, values },
+      { onSuccess: () => setToEdit(null) }
+    );
   }
 
   function toggleSort(key: SortKey) {
@@ -157,12 +285,20 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
                 <p className="font-semibold text-gray-900 dark:text-gray-100">{r.guest_name}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{timeAgo(r.created_at)}</p>
               </div>
-              <button
-                onClick={() => setToDelete(r)}
-                className="shrink-0 text-xs text-red-600 dark:text-red-400 hover:underline"
-              >
-                Remover
-              </button>
+              <div className="shrink-0 flex items-center gap-3">
+                <button
+                  onClick={() => setToEdit(r)}
+                  className="text-xs text-brand-600 dark:text-brand-400 hover:underline"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => setToDelete(r)}
+                  className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                >
+                  Remover
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mt-2">
@@ -205,6 +341,15 @@ export function RsvpTable({ rsvps }: { rsvps: Rsvp[] }) {
           pending={deleteRsvp.isPending}
           onCancel={() => !deleteRsvp.isPending && setToDelete(null)}
           onConfirm={confirmDelete}
+        />
+      )}
+
+      {toEdit && (
+        <EditRsvpModal
+          rsvp={toEdit}
+          pending={updateRsvp.isPending}
+          onCancel={() => !updateRsvp.isPending && setToEdit(null)}
+          onSave={saveEdit}
         />
       )}
     </div>
