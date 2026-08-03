@@ -51,3 +51,80 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* ---------- Dinossauro amarelo montado pelo cavalo vermelho ---------- */
+
+/* Travessia da tela, da esquerda para a direita */
+.dino-cross {
+  will-change: transform;
+  animation: dino-cross 9s linear forwards;
+}
+
+/* Sobe e desce do corpo do dino enquanto ele corre */
+.dino-body {
+  animation: dino-bob 0.55s ease-in-out infinite alternate;
+}
+
+/* Cavaleiro pula um pouco fora de fase com o dino */
+.dino-rider {
+  animation: dino-hop 0.55s ease-in-out infinite alternate;
+  animation-delay: -0.12s;
+}
+
+/* Passadas: as pernas giram em torno do próprio topo (quadril) */
+.dino-step-a,
+.dino-step-b {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: dino-step 0.55s ease-in-out infinite alternate;
+}
+
+.dino-step-b {
+  animation-direction: alternate-reverse;
+}
+
+@keyframes dino-cross {
+  from {
+    transform: translate3d(-340px, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(100vw + 340px), 0, 0);
+  }
+}
+
+@keyframes dino-bob {
+  from {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  to {
+    transform: translateY(-9px) rotate(1.5deg);
+  }
+}
+
+@keyframes dino-hop {
+  from {
+    transform: translateY(1px) rotate(-2deg);
+  }
+  to {
+    transform: translateY(-11px) rotate(2deg);
+  }
+}
+
+@keyframes dino-step {
+  from {
+    transform: rotate(-17deg);
+  }
+  to {
+    transform: rotate(17deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dino-cross,
+  .dino-body,
+  .dino-rider,
+  .dino-step-a,
+  .dino-step-b {
+    animation: none;
+  }
+}
