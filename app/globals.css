@@ -119,12 +119,166 @@
   }
 }
 
+/* ---------- Pelada do peixe com o elefante ---------- */
+
+/* Entrada e saída da cena (o componente se desmonta quando termina) */
+.match-scene {
+  will-change: transform, opacity;
+  animation: match-scene 12s ease-in-out forwards;
+}
+
+/* O peixe pula pra cabecear quando a bola chega nele */
+.match-fish {
+  animation: match-fish-hop 2.4s ease-in-out infinite;
+}
+
+/* O elefante balança esperando o passe */
+.match-elephant {
+  animation: match-elephant-bob 1.2s ease-in-out infinite alternate;
+}
+
+/* Perna e tromba chutam quando a bola chega do outro lado */
+.match-kick,
+.match-trunk {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: match-kick 2.4s ease-in-out infinite;
+}
+
+.match-trunk {
+  animation-name: match-trunk;
+}
+
+/* Vaivém da bola entre os dois, em arco */
+.match-ball {
+  animation: match-ball 2.4s linear infinite;
+}
+
+.match-ball-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: match-ball-spin 1.2s linear infinite;
+}
+
+@keyframes match-scene {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  6%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes match-fish-hop {
+  0% {
+    transform: translateY(-22px) rotate(-10deg);
+  }
+  22%,
+  78% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-22px) rotate(-10deg);
+  }
+}
+
+@keyframes match-elephant-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes match-kick {
+  0%,
+  32% {
+    transform: rotate(0deg);
+  }
+  48% {
+    transform: rotate(-38deg);
+  }
+  68%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes match-trunk {
+  0%,
+  32% {
+    transform: rotate(0deg);
+  }
+  48% {
+    transform: rotate(24deg);
+  }
+  68%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Parábola do passe: sobe, cruza a tela e desce do outro lado */
+@keyframes match-ball {
+  0% {
+    transform: translate(0, 0);
+  }
+  12.5% {
+    transform: translate(28px, -74px);
+  }
+  25% {
+    transform: translate(56px, -104px);
+  }
+  37.5% {
+    transform: translate(84px, -74px);
+  }
+  50% {
+    transform: translate(112px, -4px);
+  }
+  62.5% {
+    transform: translate(84px, -74px);
+  }
+  75% {
+    transform: translate(56px, -104px);
+  }
+  87.5% {
+    transform: translate(28px, -74px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes match-ball-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dino-cross,
   .dino-body,
   .dino-rider,
   .dino-step-a,
-  .dino-step-b {
+  .dino-step-b,
+  .match-scene,
+  .match-fish,
+  .match-elephant,
+  .match-kick,
+  .match-trunk,
+  .match-ball,
+  .match-ball-spin {
     animation: none;
   }
 }

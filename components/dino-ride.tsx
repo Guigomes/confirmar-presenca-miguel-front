@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-/** Quanto tempo depois de carregar a página o dino aparece (ms) */
-const DELAY_MS = 10_000;
+import { animations } from '@/lib/config/animations';
 
 /**
- * Surpresa: 10 segundos depois de carregar a página, um dinossauro amarelo
+ * Surpresa: 3 segundos depois de carregar a página, um dinossauro amarelo
  * atravessa a tela sendo montado por um cavalo vermelho. Some sozinho no fim.
  */
 export function DinoRide() {
@@ -16,7 +14,7 @@ export function DinoRide() {
     // Respeita quem prefere menos animação
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const timer = setTimeout(() => setRunning(true), DELAY_MS);
+    const timer = setTimeout(() => setRunning(true), animations.dinoDelay);
     return () => clearTimeout(timer);
   }, []);
 

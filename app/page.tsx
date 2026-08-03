@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { RsvpForm } from '@/components/rsvp/rsvp-form';
 import { Countdown } from '@/components/countdown';
 import { DinoRide } from '@/components/dino-ride';
+import { SoccerMatch } from '@/components/soccer-match';
 import { party } from '@/lib/config/party';
 import { formatDate, formatLongDate } from '@/lib/utils/date';
 
@@ -10,8 +11,10 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Surpresa: 10s depois do carregamento, o dino cruza a tela */}
+      {/* Surpresas: 3s depois do carregamento o dino cruza a tela e, na
+          sequência, o peixe e o elefante batem uma bola no rodapé */}
       <DinoRide />
+      <SoccerMatch />
 
       {/* Hero: campo de futebol */}
       <section className="relative bg-gradient-to-b from-brand-600 via-brand-700 to-brand-900 text-white overflow-hidden">
